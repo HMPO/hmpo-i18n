@@ -148,60 +148,89 @@ describe('i18n.middleware', function () {
   });
 
   describe('localisedViews middleware', () => {
-    let NewClass, options, cb;
+    let NewClass, options, opts, env, cb;
 
     beforeEach(() => {
-        sinon.stub(OriginalViewClass.prototype, 'render');
+      env = {
+        render: sinon.stub()
+      };
+      app.get.withArgs('nunjucksEnv').returns(env);
 
-        i18n.middleware(app, options);
-        NewClass = app.set.args[0][1];
-        cb = sinon.stub();
-        options = { noCache: true };
+      sinon.stub(OriginalViewClass.prototype, 'render');
+
+      i18n.middleware(app, options);
+      NewClass = app.set.args[0][1];
+      cb = sinon.stub();
+      options = { noCache: true };
+      opts = { locals: true };
     });
 
     it('sets the view class to an exended view class', () => {
-        app.set.should.have.been.calledWithExactly('view', sinon.match.func);
+      app.set.should.have.been.calledWithExactly('view', sinon.match.func);
 
-        let instance = new NewClass;
-        instance.should.be.an.instanceOf(OriginalViewClass);
+      let instance = new NewClass;
+      instance.should.be.an.instanceOf(OriginalViewClass);
     });
 
     it('tries localised paths', () => {
-        let instance = new NewClass;
-        instance.name = 'path/file.html';
-        instance.path = 'path/file';
-        instance.ext = '.html';
-        options.lang = ['fr', 'en'];
+      let instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file';
+      instance.ext = '.html';
+      opts.lang = ['fr', 'en'];
 
-        instance.render(options, cb);
+      instance.render(opts, cb);
 
-        localisedView.existsFn.should.have.been.calledWith('/view1/path/file_fr.html');
-        localisedView.existsFn.should.have.been.calledWith('/view2/path/file_fr.html');
-        localisedView.existsFn.should.have.been.calledWith('/view1/path/file_en.html');
-        localisedView.existsFn.should.have.been.calledWith('/view2/path/file_en.html');
-
-      });
-
-    it('updates render path with first found file', () => {
-        let instance = new NewClass;
-        instance.name = 'path/file.html';
-        instance.path = 'path/file.html';
-        options.lang = ['fr'];
-
-        localisedView.existsFn.withArgs('/view1/path/file_en.html').yields(true);
-        localisedView.existsFn.withArgs('/view2/path/file_fr.html').yields(true);
-
-        instance.render(options, cb);
-
-        instance.path.should.equal('path/file_fr.html');
-        instance.name.should.equal('path/file_fr.html');
+      localisedView.existsFn.should.have.been.calledWith('/view1/path/file_fr.html');
+      localisedView.existsFn.should.have.been.calledWith('/view2/path/file_fr.html');
+      localisedView.existsFn.should.have.been.calledWith('/view1/path/file_en.html');
+      localisedView.existsFn.should.have.been.calledWith('/view2/path/file_en.html');
     });
 
-    it('calls super render', () => {
+    it('renders with first found file', () => {
+      let instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file.html';
+      opts.lang = ['fr'];
+
+      localisedView.existsFn.withArgs('/view1/path/file_en.html').yields(true);
+      localisedView.existsFn.withArgs('/view2/path/file_fr.html').yields(true);
+
+      instance.render(opts, cb);
+
+      env.render.should.have.been.calledWithExactly('path/file_fr.html', opts, cb);
+    });
+
+    it('calls parent if no found file', () => {
+      let instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file';
+      opts.lang = ['fr'];
+
+      instance.render(opts, cb);
+      env.render.should.not.have.been.called;
+      OriginalViewClass.prototype.render.should.have.been.calledWithExactly(opts, cb);
+    });
+
+    it('updates render name if no found file with extension', () => {
+      let instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file.html';
+      opts.lang = ['fr'];
+
+      instance.render(opts, cb);
+
+      env.render.should.not.have.been.called;
+      OriginalViewClass.prototype.render.should.have.been.calledWithExactly(opts, cb);
+    });
+
+    it('calls super render if there is no path', () => {
         let instance = new NewClass;
 
-        instance.render(options, cb);
-        OriginalViewClass.prototype.render.should.have.been.calledWithExactly(options, cb);
+        instance.render(opts, cb);
+
+        env.render.should.not.have.been.called;
+        OriginalViewClass.prototype.render.should.have.been.calledWithExactly(opts, cb);
     });
 
   });
