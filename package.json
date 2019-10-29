@@ -26,22 +26,22 @@
   },
   "homepage": "https://github.com/UKHomeOffice/passports-i18n",
   "dependencies": {
-    "async": "^2.6.3",
+    "async": "^3.1.0",
     "callsites": "^3.1.0",
     "deep-clone-merge": "^1.4.0",
     "findup": "^0.1.5",
-    "glob": "^7.1.4",
-    "lodash": "^4.17.14"
+    "glob": "^7.1.5",
+    "lodash": "^4.17.15"
   },
   "optionalDependencies": {
     "chokidar": "^2.1.5"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.0.1",
-    "mocha": "^6.1.4",
+    "eslint": "^6.6.0",
+    "mocha": "^6.2.2",
     "reqres": "^2.1.0",
-    "sinon": "^7.3.2",
+    "sinon": "^7.5.0",
     "sinon-chai": "^3.3.0"
   }
 }
