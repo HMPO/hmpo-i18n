@@ -1,6 +1,8 @@
-var i18n = require('../../index');
+const i18n = require('../../index');
 
-var localisedView = require('../../lib/localised-view');
+const localisedView = require('../../lib/localised-view');
+const Translator = require('../../lib/translator');
+const path = require('path');
 
 describe('i18n.middleware', function () {
   var req, res, next, app, options, OriginalViewClass;
@@ -145,6 +147,27 @@ describe('i18n.middleware', function () {
       });
     });
 
+    it('set new current language', function (done) {
+      middleware(req, res, function () {
+        delete res.locals;
+        req.setLanguage('es');
+        req.translate('key');
+        i18n.Translator.prototype.translate.should.have.been.calledWith('key', { lang: ['es'] });
+        res.cookie.should.have.been.calledWithExactly('lang', 'es', { maxAge: 86400, name: 'lang' });
+        done();
+      });
+    });
+
+    it('doesn\'t set coookie if no cookie name', function (done) {
+      delete options.cookie.name;
+      middleware(req, res, function () {
+        delete res.locals;
+        req.setLanguage('es');
+        res.cookie.should.not.have.been.called;
+        done();
+      });
+    });
+
   });
 
   describe('localisedViews middleware', () => {
@@ -231,6 +254,116 @@ describe('i18n.middleware', function () {
 
         env.render.should.not.have.been.called;
         OriginalViewClass.prototype.render.should.have.been.calledWithExactly(opts, cb);
+    });
+  });
+
+  describe('localisedViews locations', () => {
+    let OriginalViewClass, env, translator, cb;
+
+    beforeEach(() => {
+      app = {
+        use: sinon.stub(),
+        get: sinon.stub(),
+        set: sinon.stub()
+      };
+      app.get.returns();
+
+      OriginalViewClass = class {
+        render(){ }
+      };
+      sinon.stub(OriginalViewClass.prototype, 'render');
+      app.get.withArgs('view').returns(OriginalViewClass);
+
+      env = {
+        render: sinon.stub()
+      };
+      app.get.withArgs('nunjucksEnv').returns(env);
+
+      translator = new Translator({});
+
+      cb = sinon.stub();
+    });
+
+    it('gets views from the project dir', () => {
+      localisedView.setup(app, translator, { noCache: true });
+      const NewClass = app.set.args[0][1];
+      const instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file';
+      instance.ext = '.html';
+
+      instance.render({}, cb);
+
+      localisedView.existsFn.should.have.been.calledWith(path.resolve(__dirname, '../../path/file_en.html'));
+    });
+
+    it('gets views from nunjucks loader', () => {
+      env.loaders = [ { searchPaths: '/nunjucks/' } ];
+      // app.get.withArgs('views').returns('.');
+
+      localisedView.setup(app, translator, { noCache: true });
+      const NewClass = app.set.args[0][1];
+      const instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file';
+      instance.ext = '.html';
+
+      instance.render({}, cb);
+
+      localisedView.existsFn.should.have.been.calledWith('/nunjucks/path/file_en.html');
+    });
+
+    it('gets views from express views', () => {
+      app.get.withArgs('views').returns('/express/');
+
+      localisedView.setup(app, translator, { noCache: true });
+      const NewClass = app.set.args[0][1];
+      const instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file';
+      instance.ext = '.html';
+
+      instance.render({}, cb);
+
+      localisedView.existsFn.should.have.been.calledWith('/express/path/file_en.html');
+    });
+
+    it('get cached file', () => {
+      app.get.withArgs('views').returns('/express/');
+
+      localisedView.setup(app, translator, {});
+      const NewClass = app.set.args[0][1];
+      const instance = new NewClass;
+      instance.name = 'path/file.html';
+      instance.path = 'path/file';
+      instance.ext = '.html';
+
+      // existing first request
+      localisedView.existsFn.yields(true);
+      instance.render({}, cb);
+      localisedView.existsFn.should.have.been.calledOnce;
+
+      // existing second request
+      instance.render({}, cb);
+      localisedView.existsFn.should.have.been.calledOnce;
+
+      // not existing first request
+      localisedView.existsFn.yields(false);
+      instance.name = 'path/new.html';
+      instance.path = 'path/new';
+      instance.render({}, cb);
+      localisedView.existsFn.should.have.been.calledTwice;
+
+      // not existing second request
+      instance.render({}, cb);
+      localisedView.existsFn.should.have.been.calledTwice;
+
+      // final cache state
+      localisedView.cache.should.deep.equal({
+        '/express/path/file_en.html': true,
+        '/express/path/new_en.html': false
+      });
+
     });
 
   });
