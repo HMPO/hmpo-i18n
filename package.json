@@ -11,7 +11,7 @@
     "lint": "eslint ./lib",
     "unit": "nyc --reporter=lcov --reporter=text-summary _mocha --require test/helpers --recursive ./test/spec",
     "cover": "nyc check-coverage",
-    "test": "npm run lint && npm run unit && npm run cover && npm audit"
+    "test": "npm run lint && npm run unit && npm run cover && npm audit --production"
   },
   "repository": {
     "type": "git",
@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/UKHomeOffice/passports-i18n",
   "dependencies": {
-    "async": "^3.1.1",
+    "async": "^3.2.0",
     "callsites": "^3.1.0",
-    "deep-clone-merge": "^1.5.0",
+    "deep-clone-merge": "^1.5.1",
     "findup": "^0.1.5",
     "glob": "^7.1.6",
     "lodash": "^4.17.15"
@@ -40,11 +40,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
-    "mocha": "^7.0.1",
+    "mocha": "^7.1.0",
     "nyc": "^15.0.0",
     "reqres": "^3.0.1",
-    "sinon": "^8.1.1",
-    "sinon-chai": "^3.4.0"
+    "sinon": "^9.0.1",
+    "sinon-chai": "^3.5.0"
   },
   "nyc": {
     "all": true,
