@@ -1,6 +1,6 @@
 {
   "name": "hmpo-i18n",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "i18n for node",
   "main": "index.js",
   "directories": {
