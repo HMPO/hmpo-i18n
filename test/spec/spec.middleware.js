@@ -38,6 +38,31 @@ describe('i18n.middleware', function () {
     i18n.middleware.should.be.a('function');
   });
 
+  describe('locals', function () {
+    var middleware;
+
+    beforeEach(function () {
+      i18n.middleware(app, options);
+      middleware = app.use.args[0][0];
+    });
+
+    it('sets the translate local function', function (done) {
+      middleware(req, res, function () {
+        res.locals.translate.should.be.a('function');
+        res.locals.translate.should.equal(req.translate);
+        done();
+      });
+    });
+
+    it('sets the t local function', function (done) {
+      middleware(req, res, function () {
+        res.locals.t.should.be.a('function');
+        res.locals.t.should.equal(req.translate);
+        done();
+      });
+    });
+  });
+
   describe('req.translate', function () {
     var middleware;
 
