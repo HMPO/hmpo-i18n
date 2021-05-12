@@ -5,11 +5,9 @@ module.exports = {
         last: 'Lennon'
       }
     },
-    default: {
-      name: {
-        first: 'John',
-        last: 'Smith'
-      }
+    name: {
+      first: 'John',
+      last: 'Smith'
     }
   }
 };

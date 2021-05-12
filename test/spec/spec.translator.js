@@ -163,7 +163,7 @@ describe('Translator', function () {
       });
 
       it('does not mutate the pre-defined resources', function () {
-        require('../stubs/predefined').en.default.should.not.have.property('name');
+        require('../stubs/predefined').en.should.not.have.property('name');
       });
 
     });
