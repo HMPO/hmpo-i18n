@@ -9,7 +9,7 @@ describe('fs backend', function () {
 
   describe('default behaviour', function () {
 
-    it('loads json files from default location', function (done) {
+    it('loads json or yaml files from default location', function (done) {
       backend.load(function (err, data) {
         data.en.should.eql({
           test: {
@@ -75,6 +75,7 @@ describe('fs backend', function () {
         data.en.should.eql({
           test: {
             name: 'Jack',
+            namespaced: 'item',
             deep: {
               object: 'Other English'
             }

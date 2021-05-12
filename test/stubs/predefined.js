@@ -1,12 +1,8 @@
 module.exports = {
     en: {
-        default: {
-            predef: 'true'
-        }
+        predef: 'true'
     },
     fr: {
-        default: {
-            predef: 'vrai'
-        }
+        predef: 'vrai'
     }
 };

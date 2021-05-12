@@ -10,12 +10,12 @@ The aim of this project is to create a module-safe, lightweight translation libr
 ## Install
 
 ```
-npm install [--save] hmpo-i18n
+npm install hmpo-i18n
 ```
 
 ## Usage
 
-First create some resource files. These should be json files and the location of the file within your project will define the language it corresponds to.
+First create some resource files. These should be json or yaml files and the location of the file within your project will define the language it corresponds to.
 
 An example file structure would look like:
 
@@ -24,6 +24,8 @@ index.js
 /locales
   /en
     /default.json
+    /validation.yaml
+    /pages.errors.yaml
   /fr
     /default.json
   /de
@@ -31,7 +33,7 @@ index.js
 ```
 
 If you wish to create additional namespaces within your project, then create additional files within a language directory with names corresponding to the namespace. For details on how to configure resource paths see ["Resource path" documentation below](#resource-path)
-
+These namespaces are superimposed onto the default layout.
 ### Standalone:
 
 ```javascript
@@ -103,8 +105,6 @@ If multiple langauges are passed, then the first matching language will be used.
 i18n.translate('greeting', { namespace: 'admin' });
 ```
 
-For running code examples, look in [the examples directory](./examples).
-
 ## Initialisation options
 
 In each case options can be passed both to the i18n function, or to the middleware constructor equivalently.
@@ -148,11 +148,11 @@ If required, both the `fallbackLng` and `fallbackNamespace` options can be passe
 
 ### Resource path
 
-For the fs resource loader (currently the only backend supported), sets the location to load resource files from, and pattern for parsing namespace and language from the file path - Default: `locales/__lng__/__ns__.json`.
+For the fs resource loader (currently the only backend supported), sets the location to load resource files from, and pattern for parsing namespace and language from the file path - Default: `locales/__lng__/__ns__.__ext__`.
 
 ```javascript
 i18n({
-    path: '/var/i18n/__lng__/__ns__/resource.json'
+    path: '/var/i18n/__lng__/__ns__/resource.__ext__'
 });
 ```
 
@@ -188,9 +188,7 @@ Resources returned by the callback will be an object of the following form:
 ```javascript
 {
     en: {
-        default: {
-            ... translation keys for default namespace ...
-        }
+        ... translation keys for default namespace ...
         'other-namespace': {
             ... translation keys for afternative namespace...
         }

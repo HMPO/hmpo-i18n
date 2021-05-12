@@ -1,5 +1,6 @@
 {
-    "name": "Jack",
+    "name": "Bob",
+    "namespaced": "item",
     "deep": {
       "object": "Other English"
     }
