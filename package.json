@@ -33,6 +33,7 @@
     "deep-clone-merge": "^1.5.2",
     "findup": "^0.1.5",
     "glob": "^7.1.7",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
