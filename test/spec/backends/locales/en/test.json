@@ -1,7 +1,4 @@
 {
     "name": "Bob",
-    "namespaced": "item",
-    "deep": {
-      "object": "Other English"
-    }
+    "namespaced": "item"
 }
