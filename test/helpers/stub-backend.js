@@ -1,7 +1,7 @@
 module.exports = function () {
 
-  return {
-    load: sinon.stub()
-  }
+    return {
+        load: sinon.stub()
+    };
 
 };

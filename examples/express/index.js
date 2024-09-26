@@ -1,8 +1,10 @@
-var app = require('express')();
+let app = require('express')();
 
-var i18n = require('i18n-future').middleware();
+let i18n = require('hmpo-i18n');
 
-app.use(i18n);
+i18n.middleware(app, {
+    detect: true
+});
 
 app.get('/', function (req, res) {
     // a translate method is now available on the request
