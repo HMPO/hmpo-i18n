@@ -1,11 +1,17 @@
-let Translator = require('../../').Translator;
+import i18n from '../../index.js';
+import stubBackend from '../helpers/stub-backend.js';
+import simple from '../stubs/simple.js';
+import namespaces from '../stubs/namespaces.js';
+import predefined from '../stubs/predefined.js';
+
+const Translator = i18n.Translator;
 
 describe('Translator', function () {
 
     let translator, backend;
 
     beforeEach(function () {
-        backend = require('../helpers/stub-backend')();
+        backend = stubBackend();
         translator = new Translator({
             backend: backend
         });
@@ -48,7 +54,7 @@ describe('Translator', function () {
     describe('translate', function () {
 
         beforeEach(function () {
-            backend.load.yield(null, require('../stubs/simple'));
+            backend.load.yield(null, simple);
         });
 
         it('does a basic lookup', function () {
@@ -96,7 +102,7 @@ describe('Translator', function () {
 
             beforeEach(function () {
                 translator.reload();
-                backend.load.yield(null, require('../stubs/namespaces'));
+                backend.load.yield(null, namespaces);
             });
 
             it('takes an optional namespace parameter', function () {
@@ -147,9 +153,9 @@ describe('Translator', function () {
             beforeEach(function () {
                 translator = new Translator({
                     backend: backend,
-                    resources: require('../stubs/predefined')
+                    resources: predefined
                 });
-                backend.load.yield(null, require('../stubs/simple'));
+                backend.load.yield(null, simple);
             });
 
             it('includes translations from the pre-defined resources', function () {
@@ -163,7 +169,7 @@ describe('Translator', function () {
             });
 
             it('does not mutate the pre-defined resources', function () {
-                require('../stubs/predefined').en.should.not.have.property('name');
+                predefined.en.should.not.have.property('name');
             });
 
         });

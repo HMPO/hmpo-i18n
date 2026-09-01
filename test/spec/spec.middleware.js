@@ -1,8 +1,11 @@
-const i18n = require('../../index');
+import i18n from '../../index.js';
+import localisedView from '../../lib/localised-view.js';
+import Translator from '../../lib/translator.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import hmpoReqres from 'hmpo-reqres';
 
-const localisedView = require('../../lib/localised-view');
-const Translator = require('../../lib/translator');
-const path = require('path');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('i18n.middleware', function () {
     let req, res, app, options, OriginalViewClass;
@@ -21,8 +24,8 @@ describe('i18n.middleware', function () {
 
         sinon.stub(localisedView, 'existsFn').yields(false);
 
-        req = require('hmpo-reqres').req();
-        res = require('hmpo-reqres').res();
+        req = hmpoReqres.req();
+        res = hmpoReqres.res();
         sinon.stub(i18n.Translator.prototype, 'translate');
         sinon.stub(i18n.backends.fs, 'load').yieldsAsync(null, {});
         options = { cookie: { name: 'lang', maxAge: 86400 } };

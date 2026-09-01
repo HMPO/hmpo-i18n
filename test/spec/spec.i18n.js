@@ -1,4 +1,4 @@
-let i18n = require('../..');
+import i18n from '../../index.js';
 
 describe('i18n-future', function () {
 

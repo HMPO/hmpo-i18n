@@ -1,9 +1,8 @@
-const backend = require('../../../lib/backends/fs');
-const path = require('path');
-const proxyquire = require('proxyquire');
-const sinon = require('sinon');
-const chai = require('chai');
-const { expect } = chai;
+import backend from '../../../lib/backends/fs.js';
+import path from 'path';
+import esmock from 'esmock';
+import sinon from 'sinon';
+import { expect } from 'chai';
 
 describe('fs backend', function () {
     it('exports a load function', function () {
@@ -38,7 +37,7 @@ describe('fs backend', function () {
     describe('with options', function () {
         it('can handle a path created with path.resolve', function (done) {
             backend.load({
-                path: path.resolve(__dirname, '../../../locales/__lng__/__ns__.json')
+                path: path.resolve(import.meta.dirname, '../../../locales/__lng__/__ns__.json')
             }, function (err, data) {
                 if (err) return done(err);
                 expect(data).to.have.property('en');
@@ -49,7 +48,7 @@ describe('fs backend', function () {
 
         it('can handle a path created with path.join', function (done) {
             backend.load({
-                path: path.join(__dirname, '../../../locales/__lng__/__ns__.json')
+                path: path.join(import.meta.dirname, '../../../locales/__lng__/__ns__.json')
             }, function (err, data) {
                 if (err) return done(err);
                 expect(data).to.have.property('en');
@@ -61,7 +60,7 @@ describe('fs backend', function () {
         it('loads locales when the configured path contains Windows separators', function (done) {
             backend.load({
                 path: 'locales\\__lng__\\__ns__.__ext__',
-                baseDir: path.resolve(__dirname)
+                baseDir: path.resolve(import.meta.dirname)
             }, function (err, data) {
                 if (err) return done(err);
                 expect(data.en).to.eql({
@@ -87,7 +86,7 @@ describe('fs backend', function () {
 
         it('uses the baseDir from options', function (done) {
             backend.load({
-                baseDir: path.resolve(__dirname)
+                baseDir: path.resolve(import.meta.dirname)
             }, function (err, data) {
                 if (err) return done(err);
                 expect(data).to.have.property('en');
@@ -99,8 +98,8 @@ describe('fs backend', function () {
         it('uses a baseDir array from options', function (done) {
             backend.load({
                 baseDir: [
-                    path.resolve(__dirname),
-                    path.resolve(__dirname, '../../../')
+                    path.resolve(import.meta.dirname),
+                    path.resolve(import.meta.dirname, '../../../')
                 ]
             }, function (err, data) {
                 if (err) return done(err);
@@ -154,7 +153,7 @@ describe('fs backend', function () {
         let globStub;
         let fsStub;
 
-        beforeEach(function () {
+        beforeEach(async function () {
             sandbox = sinon.createSandbox();
 
             callsitesStub = sandbox.stub();
@@ -164,12 +163,12 @@ describe('fs backend', function () {
                 readFile: sandbox.stub()
             };
 
-            load = proxyquire('../../../lib/backends/fs', {
-                'callsites': { default: callsitesStub },
+            ({ default: { load } } = await esmock('../../../lib/backends/fs.js', {
+                callsites: { default: callsitesStub },
                 'find-up': { findUp: findupStub },
-                'glob': { glob: globStub },
-                'fs': fsStub
-            }).load;
+                glob: { glob: globStub },
+                fs: fsStub
+            }));
         });
 
 
@@ -259,6 +258,7 @@ describe('fs backend', function () {
 
     describe('watchFiles', function () {
         let sandbox;
+        let mod;
         let load;
         let callsitesStub;
         let findupStub;
@@ -266,7 +266,7 @@ describe('fs backend', function () {
         let fsStub;
         let chokidarStub;
 
-        beforeEach(function () {
+        beforeEach(async function () {
             sandbox = sinon.createSandbox();
             callsitesStub = sandbox.stub();
             findupStub = sandbox.stub();
@@ -281,17 +281,19 @@ describe('fs backend', function () {
                 })
             };
 
-            load = proxyquire('../../../lib/backends/fs', {
-                'callsites': { default: callsitesStub },
-                'find-up': { findUp: findupStub, },
-                'glob': { glob: globStub },
-                'fs': fsStub,
-                'chokidar': chokidarStub
-            }).load;
+            mod = await esmock.p('../../../lib/backends/fs.js', {
+                callsites: { default: callsitesStub },
+                'find-up': { findUp: findupStub },
+                glob: { glob: globStub },
+                fs: fsStub,
+                chokidar: chokidarStub
+            });
+            load = mod.default.load;
         });
 
         afterEach(function () {
             sandbox.restore();
+            esmock.purge(mod);
         });
 
         it('should call chokidar.watch when options.watch is true', function (done) {
