@@ -3,6 +3,7 @@
   "description": "Example script showing express middleware i18n-future behaviour",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",

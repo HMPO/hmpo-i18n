@@ -1,8 +1,11 @@
-const express = require('express');
+import express from 'express';
+import i18n from 'hmpo-i18n';
+import cookieParser from 'cookie-parser';
+import nunjucks from 'nunjucks';
+import en from './locales/en/default.json' with { type: 'json' };
+import cy from './locales/cy/default.json' with { type: 'json' };
+
 const app = express();
-const i18n = require('hmpo-i18n');
-const cookieParser = require('cookie-parser');
-const nunjucks = require('nunjucks');
 
 app.use(cookieParser());
 
@@ -14,10 +17,7 @@ app.set('view engine', 'html');
 
 i18n.middleware(app, {
     detect: true,
-    resources: {
-        en: require('./locales/en/default.json'),
-        cy: require('./locales/cy/default.json'),
-    },
+    resources: { en, cy },
     cookie: {
         name: 'lang',
         options: {
