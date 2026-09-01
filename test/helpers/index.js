@@ -1,8 +1,9 @@
-let chai = require('chai');
+import { should, use, expect } from 'chai';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
 
-chai.should();
-chai.use(require('sinon-chai').default);
+should();
+use(sinonChai);
 
-global.sinon = require('sinon');
-global.expect = chai.expect;
-
+global.sinon = sinon;
+global.expect = expect;

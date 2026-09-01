@@ -1,5 +1,5 @@
-const js = require('@eslint/js');
-const globals = require('globals');
+import js from '@eslint/js';
+import globals from 'globals';
 
 
 const styleRules = {
@@ -20,11 +20,12 @@ const styleRules = {
 };
 
 
-module.exports = [
+export default [
     js.configs.recommended,
     {
         languageOptions: {
-            ecmaVersion: 2022,
+            ecmaVersion: 'latest',
+            sourceType: 'module',
             globals: {
                 ...globals.node,
             }
