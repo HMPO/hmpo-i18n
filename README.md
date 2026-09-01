@@ -84,9 +84,10 @@ E.g. locales/en/default.json
 ### As an express middleware:
 
 ```javascript
-var app = require('express')();
+import express from 'express';
+import i18n from 'hmpo-i18n';
 
-var i18n = require('hmpo-i18n');
+const app = express();
 
 i18n.middleware(app);
 
@@ -160,11 +161,10 @@ options. This is useful when you have shared translations that are used across a
 load from npm modules or similar - Default: `{}`
 
 ```javascript
+import { en, fr } from 'shared-translations';
+
 i18n({
-    resources: {
-      en: require('shared-translations').en,
-      fr: require('shared-translations').fr
-    }
+    resources: { en, fr }
 });
 ```
 
