@@ -1,6 +1,6 @@
 {
   "name": "hmpo-i18n",
-  "version": "8.0.1",
+  "version": "9.0.0",
   "description": "i18n for node",
   "type": "module",
   "main": "index.js",
